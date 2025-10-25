@@ -14,7 +14,7 @@ function PaintByNumbersCanvas({ quantized, palette, originalImage }) {
     renderPaintByNumbers(paintByNumbersRef.current, quantized, palette, {
       showNumbers: true,
       showEdges: true,
-      minRegionSize: 50,
+      minRegionSize: 100, // 10x10 pixels minimum
       edgeThickness: 2
     });
 
