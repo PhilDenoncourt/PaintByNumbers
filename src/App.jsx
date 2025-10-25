@@ -2,14 +2,18 @@ import { useState } from 'react';
 import ImageUploader from './components/ImageUploader';
 import PaintByNumbersCanvas from './components/PaintByNumbersCanvas';
 import ColorPalette from './components/ColorPalette';
-import { DEFAULT_PALETTE, quantizeImage } from './utils/colorUtils';
+import PaletteSelector from './components/PaletteSelector';
+import { PALETTES, quantizeImage } from './utils/colorUtils';
 import './App.css';
 
 function App() {
   const [originalImage, setOriginalImage] = useState(null);
+  const [imageData, setImageData] = useState(null);
   const [quantized, setQuantized] = useState(null);
-  const [palette] = useState(DEFAULT_PALETTE);
+  const [selectedPaletteKey, setSelectedPaletteKey] = useState('basic');
   const [processing, setProcessing] = useState(false);
+
+  const palette = PALETTES[selectedPaletteKey].colors;
 
   const handleImageLoad = (img) => {
     setProcessing(true);
@@ -22,15 +26,31 @@ function App() {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
 
-    // Get image data and quantize
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    // Get image data and store it
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    setImageData(imgData);
 
     // Use setTimeout to prevent blocking the UI
     setTimeout(() => {
-      const quantizedData = quantizeImage(imageData, palette);
+      const quantizedData = quantizeImage(imgData, palette);
       setQuantized(quantizedData);
       setProcessing(false);
     }, 100);
+  };
+
+  const handlePaletteChange = (paletteKey) => {
+    setSelectedPaletteKey(paletteKey);
+
+    // Re-quantize the image with the new palette if we have image data
+    if (imageData) {
+      setProcessing(true);
+      setTimeout(() => {
+        const newPalette = PALETTES[paletteKey].colors;
+        const quantizedData = quantizeImage(imageData, newPalette);
+        setQuantized(quantizedData);
+        setProcessing(false);
+      }, 100);
+    }
   };
 
   return (
@@ -41,8 +61,15 @@ function App() {
       </header>
 
       <main className="app-main">
-        {!quantized && (
+        {!originalImage && (
           <ImageUploader onImageLoad={handleImageLoad} />
+        )}
+
+        {originalImage && !processing && (
+          <PaletteSelector
+            selectedPalette={selectedPaletteKey}
+            onPaletteChange={handlePaletteChange}
+          />
         )}
 
         {processing && (
@@ -51,7 +78,7 @@ function App() {
           </div>
         )}
 
-        {quantized && (
+        {quantized && !processing && (
           <>
             <PaintByNumbersCanvas
               quantized={quantized}
@@ -63,7 +90,9 @@ function App() {
               className="reset-btn"
               onClick={() => {
                 setOriginalImage(null);
+                setImageData(null);
                 setQuantized(null);
+                setSelectedPaletteKey('basic');
               }}
             >
               Upload New Image

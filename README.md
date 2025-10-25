@@ -5,9 +5,16 @@ A React web application that converts any image into a paint-by-numbers template
 ## Features
 
 - **Image Upload**: Drag-and-drop or click to upload any image (JPG, PNG, GIF)
-- **Color Quantization**: Intelligently reduces the image to a 12-color palette using Euclidean distance color matching
+- **Multiple Color Palettes**: Choose from 5 different color palettes to create different artistic effects:
+  - **Basic** - Simple primary and secondary colors (12 colors)
+  - **Pastel** - Soft, muted tones perfect for gentle artwork (12 colors)
+  - **Earth Tones** - Natural browns, beiges, and greens for rustic scenes (12 colors)
+  - **Vibrant** - Bold, bright colors for energetic designs (12 colors)
+  - **Extended** - More color variety for detailed work (24 colors)
+- **Dynamic Palette Switching**: Change palettes on the fly to see different interpretations of your image
+- **Color Quantization**: Intelligently reduces the image to match the selected palette using Euclidean distance color matching
 - **Edge Detection**: Automatically detects boundaries between different color regions
-- **Region Numbering**: Labels each region with numbers corresponding to the color palette
+- **Region Numbering**: Labels each region with numbers corresponding to the color palette (minimum 10x10 pixels)
 - **Three Views**:
   - Original image
   - Simplified color preview
@@ -54,9 +61,10 @@ src/
 ├── components/
 │   ├── ImageUploader.jsx          # Image upload component
 │   ├── PaintByNumbersCanvas.jsx   # Canvas display component
-│   └── ColorPalette.jsx            # Color legend component
+│   ├── ColorPalette.jsx            # Color legend component
+│   └── PaletteSelector.jsx         # Palette selection dropdown
 ├── utils/
-│   ├── colorUtils.js               # Color quantization functions
+│   ├── colorUtils.js               # Color quantization functions & palettes
 │   ├── edgeDetection.js            # Edge detection and region finding
 │   └── paintByNumbersRenderer.js  # Canvas rendering utilities
 └── App.jsx                         # Main application component
@@ -64,9 +72,11 @@ src/
 
 ## Customization
 
-You can customize the color palette by modifying the `DEFAULT_PALETTE` array in `src/utils/colorUtils.js`. Each color should have:
+You can create your own custom color palettes by modifying `src/utils/colorUtils.js`. Each palette should be an array of color objects with:
 - `r`, `g`, `b`: RGB values (0-255)
 - `name`: Display name for the color legend
+
+Add your custom palette to the `PALETTES` object to make it available in the dropdown selector.
 
 ## Technologies Used
 

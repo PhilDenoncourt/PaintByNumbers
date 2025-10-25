@@ -1,0 +1,43 @@
+.palette-selector {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.palette-selector label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.palette-dropdown {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.palette-dropdown:hover {
+  border-color: #667eea;
+}
+
+.palette-dropdown:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.palette-description {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
