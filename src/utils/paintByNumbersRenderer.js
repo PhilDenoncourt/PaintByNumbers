@@ -22,6 +22,20 @@ export function renderPaintByNumbers(canvas, quantized, palette, options = {}) {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
 
+  // Find all regions
+  const regions = findRegions(quantized);
+
+  // Fill small regions with black
+  ctx.fillStyle = 'black';
+  regions.forEach(region => {
+    if (region.pixels.length < minRegionSize) {
+      // Fill each pixel of the small region with black
+      region.pixels.forEach(([y, x]) => {
+        ctx.fillRect(x, y, 1, 1);
+      });
+    }
+  });
+
   // Draw edges if enabled
   if (showEdges) {
     const edges = detectEdges(quantized);
@@ -38,10 +52,8 @@ export function renderPaintByNumbers(canvas, quantized, palette, options = {}) {
     }
   }
 
-  // Find regions and draw numbers
+  // Draw numbers on larger regions
   if (showNumbers) {
-    const regions = findRegions(quantized);
-
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
