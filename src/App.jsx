@@ -3,7 +3,7 @@ import ImageUploader from './components/ImageUploader';
 import PaintByNumbersCanvas from './components/PaintByNumbersCanvas';
 import ColorPalette from './components/ColorPalette';
 import PaletteSelector from './components/PaletteSelector';
-import { PALETTES, quantizeImage, extractDominantColors } from './utils/colorUtils';
+import { PALETTES, quantizeImage, extractDominantColors, extractUniqueColors } from './utils/colorUtils';
 import './App.css';
 
 function App() {
@@ -12,11 +12,14 @@ function App() {
   const [quantized, setQuantized] = useState(null);
   const [selectedPaletteKey, setSelectedPaletteKey] = useState('basic');
   const [adaptivePalette, setAdaptivePalette] = useState(null);
+  const [adaptiveUniquePalette, setAdaptiveUniquePalette] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  // Get the current palette - use adaptive if selected and available, otherwise use predefined
+  // Get the current palette - use adaptive/adaptiveUnique if selected, otherwise use predefined
   const palette = selectedPaletteKey === 'adaptive'
     ? adaptivePalette
+    : selectedPaletteKey === 'adaptiveUnique'
+    ? adaptiveUniquePalette
     : PALETTES[selectedPaletteKey].colors;
 
   const handleImageLoad = (img) => {
@@ -41,6 +44,10 @@ function App() {
       if (selectedPaletteKey === 'adaptive') {
         const extracted = extractDominantColors(imgData, 32);
         setAdaptivePalette(extracted);
+        paletteToUse = extracted;
+      } else if (selectedPaletteKey === 'adaptiveUnique') {
+        const extracted = extractUniqueColors(imgData, 32, 35);
+        setAdaptiveUniquePalette(extracted);
         paletteToUse = extracted;
       }
 
@@ -67,6 +74,15 @@ function App() {
           } else {
             const extracted = extractDominantColors(imageData, 32);
             setAdaptivePalette(extracted);
+            newPalette = extracted;
+          }
+        } else if (paletteKey === 'adaptiveUnique') {
+          // Check if we already have an adaptive unique palette computed
+          if (adaptiveUniquePalette) {
+            newPalette = adaptiveUniquePalette;
+          } else {
+            const extracted = extractUniqueColors(imageData, 32, 35);
+            setAdaptiveUniquePalette(extracted);
             newPalette = extracted;
           }
         } else {
@@ -121,6 +137,7 @@ function App() {
                 setQuantized(null);
                 setSelectedPaletteKey('basic');
                 setAdaptivePalette(null);
+                setAdaptiveUniquePalette(null);
               }}
             >
               Upload New Image

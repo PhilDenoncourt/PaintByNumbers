@@ -113,6 +113,50 @@ export function extractDominantColors(imageData, numColors = 32) {
 }
 
 /**
+ * Extract dominant colors and filter out similar colors
+ * Returns a palette with distinct colors only (may be fewer than requested)
+ */
+export function extractUniqueColors(imageData, maxColors = 32, minDistance = 35) {
+  // First extract more colors than needed
+  const candidateColors = extractDominantColors(imageData, maxColors * 2);
+
+  const uniqueColors = [];
+
+  for (const candidate of candidateColors) {
+    // Check if this color is too similar to any already selected color
+    let isTooSimilar = false;
+
+    for (const selected of uniqueColors) {
+      const distance = colorDistance(
+        candidate.r, candidate.g, candidate.b,
+        selected.r, selected.g, selected.b
+      );
+
+      if (distance < minDistance) {
+        isTooSimilar = true;
+        break;
+      }
+    }
+
+    // If this color is distinct enough, add it to the palette
+    if (!isTooSimilar) {
+      uniqueColors.push(candidate);
+
+      // Stop if we've reached the maximum number of colors
+      if (uniqueColors.length >= maxColors) {
+        break;
+      }
+    }
+  }
+
+  // Re-index the color names
+  return uniqueColors.map((color, index) => ({
+    ...color,
+    name: `Color ${index + 1}`
+  }));
+}
+
+/**
  * Basic/Beginner Palette - Simple primary and secondary colors
  */
 export const BASIC_PALETTE = [
@@ -223,7 +267,8 @@ export const PALETTES = {
   earth: { name: 'Earth Tones (12 colors)', colors: EARTH_TONES_PALETTE },
   vibrant: { name: 'Vibrant (12 colors)', colors: VIBRANT_PALETTE },
   extended: { name: 'Extended (24 colors)', colors: EXTENDED_PALETTE },
-  adaptive: { name: 'Adaptive (32 colors - from image)', colors: null }, // Special case: computed from image
+  adaptive: { name: 'Adaptive (up to 32 colors - from image)', colors: null }, // Special case: computed from image
+  adaptiveUnique: { name: 'Adaptive Unique (distinct colors only - from image)', colors: null }, // Special case: computed from image with filtering
 };
 
 /**

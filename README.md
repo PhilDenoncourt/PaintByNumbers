@@ -5,15 +5,17 @@ A React web application that converts any image into a paint-by-numbers template
 ## Features
 
 - **Image Upload**: Drag-and-drop or click to upload any image (JPG, PNG, GIF)
-- **Multiple Color Palettes**: Choose from 6 different color palettes to create different artistic effects:
+- **Multiple Color Palettes**: Choose from 7 different color palettes to create different artistic effects:
   - **Basic** - Simple primary and secondary colors (12 colors)
   - **Pastel** - Soft, muted tones perfect for gentle artwork (12 colors)
   - **Earth Tones** - Natural browns, beiges, and greens for rustic scenes (12 colors)
   - **Vibrant** - Bold, bright colors for energetic designs (12 colors)
   - **Extended** - More color variety for detailed work (24 colors)
-  - **Adaptive** - Automatically extracts 32 dominant colors from your image (32 colors)
+  - **Adaptive** - Automatically extracts up to 32 dominant colors from your image
+  - **Adaptive Unique** - Extracts distinct colors only, filtering out similar shades (variable count)
 - **Dynamic Palette Switching**: Change palettes on the fly to see different interpretations of your image
 - **Adaptive Color Extraction**: Uses median cut algorithm to identify the most dominant colors in your image
+- **Smart Color Filtering**: Adaptive Unique palette removes colors that are too similar (within 35 RGB units)
 - **Color Quantization**: Intelligently reduces the image to match the selected palette using Euclidean distance color matching
 - **Edge Detection**: Automatically detects boundaries between different color regions
 - **Region Numbering**: Labels each region with numbers corresponding to the color palette (minimum 10x10 pixels)
@@ -26,7 +28,9 @@ A React web application that converts any image into a paint-by-numbers template
 
 ## How It Works
 
-1. **Adaptive Palette (Optional)**: When using the Adaptive palette option, the app analyzes your image using a median cut algorithm to extract the 32 most dominant colors. This creates a custom palette specifically tailored to your image.
+1. **Adaptive Palettes (Optional)**:
+   - **Adaptive**: Uses median cut algorithm to extract up to 32 dominant colors from your image
+   - **Adaptive Unique**: Extracts dominant colors but filters out similar shades - any color within 35 RGB units of an already-selected color is excluded. This results in a more distinct set of colors (typically 15-25 colors depending on the image).
 
 2. **Color Quantization**: Each pixel in the uploaded image is analyzed and mapped to the closest color in the selected palette using Euclidean distance in RGB color space.
 
