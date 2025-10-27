@@ -15,7 +15,7 @@ A React web application that converts any image into a paint-by-numbers template
   - **Adaptive Unique** - Extracts distinct colors only, filtering out similar shades (variable count)
 - **Dynamic Palette Switching**: Change palettes on the fly to see different interpretations of your image
 - **Adaptive Color Extraction**: Uses median cut algorithm to identify the most dominant colors in your image
-- **Smart Color Filtering**: Adaptive Unique palette removes colors that are too similar (within 35 RGB units)
+- **Smart Color Filtering**: Adaptive Unique palette prioritizes most common colors and removes similar shades (within 55 RGB units)
 - **Color Quantization**: Intelligently reduces the image to match the selected palette using Euclidean distance color matching
 - **Edge Detection**: Automatically detects boundaries between different color regions
 - **Region Numbering**: Labels each region with numbers corresponding to the color palette (minimum 10x10 pixels)
@@ -30,7 +30,7 @@ A React web application that converts any image into a paint-by-numbers template
 
 1. **Adaptive Palettes (Optional)**:
    - **Adaptive**: Uses median cut algorithm to extract up to 32 dominant colors from your image
-   - **Adaptive Unique**: Extracts dominant colors but filters out similar shades - any color within 35 RGB units of an already-selected color is excluded. This results in a more distinct set of colors (typically 15-25 colors depending on the image).
+   - **Adaptive Unique**: Extracts dominant colors, counts their frequency in the image, then filters out similar shades while prioritizing the most common colors. Any color within 55 RGB units of an already-selected color is excluded. This results in a more distinct set of colors (typically 12-20 colors depending on the image), with the most important colors preserved.
 
 2. **Color Quantization**: Each pixel in the uploaded image is analyzed and mapped to the closest color in the selected palette using Euclidean distance in RGB color space.
 

@@ -46,7 +46,7 @@ function App() {
         setAdaptivePalette(extracted);
         paletteToUse = extracted;
       } else if (selectedPaletteKey === 'adaptiveUnique') {
-        const extracted = extractUniqueColors(imgData, 32, 35);
+        const extracted = extractUniqueColors(imgData, 32);
         setAdaptiveUniquePalette(extracted);
         paletteToUse = extracted;
       }
@@ -81,7 +81,7 @@ function App() {
           if (adaptiveUniquePalette) {
             newPalette = adaptiveUniquePalette;
           } else {
-            const extracted = extractUniqueColors(imageData, 32, 35);
+            const extracted = extractUniqueColors(imageData, 32);
             setAdaptiveUniquePalette(extracted);
             newPalette = extracted;
           }

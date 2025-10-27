@@ -115,14 +115,49 @@ export function extractDominantColors(imageData, numColors = 32) {
 /**
  * Extract dominant colors and filter out similar colors
  * Returns a palette with distinct colors only (may be fewer than requested)
+ * Prioritizes colors by their frequency in the image
  */
-export function extractUniqueColors(imageData, maxColors = 32, minDistance = 35) {
-  // First extract more colors than needed
-  const candidateColors = extractDominantColors(imageData, maxColors * 2);
+export function extractUniqueColors(imageData, maxColors = 32, minDistance = 55) {
+  const { width, height, data } = imageData;
 
+  // First extract more colors than needed
+  const candidateColors = extractDominantColors(imageData, maxColors * 3);
+
+  // Count how many pixels are closest to each candidate color
+  const colorFrequencies = candidateColors.map(color => ({
+    ...color,
+    count: 0
+  }));
+
+  // Sample pixels to count frequency (use same sampling as extraction)
+  const step = Math.max(1, Math.floor((width * height) / 10000));
+  for (let i = 0; i < data.length; i += step * 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    // Find closest candidate color
+    let minDist = Infinity;
+    let closestIndex = 0;
+
+    for (let j = 0; j < colorFrequencies.length; j++) {
+      const dist = colorDistance(r, g, b, colorFrequencies[j].r, colorFrequencies[j].g, colorFrequencies[j].b);
+      if (dist < minDist) {
+        minDist = dist;
+        closestIndex = j;
+      }
+    }
+
+    colorFrequencies[closestIndex].count++;
+  }
+
+  // Sort by frequency (most common first)
+  colorFrequencies.sort((a, b) => b.count - a.count);
+
+  // Now filter out similar colors, keeping the most frequent ones
   const uniqueColors = [];
 
-  for (const candidate of candidateColors) {
+  for (const candidate of colorFrequencies) {
     // Check if this color is too similar to any already selected color
     let isTooSimilar = false;
 
@@ -151,7 +186,9 @@ export function extractUniqueColors(imageData, maxColors = 32, minDistance = 35)
 
   // Re-index the color names
   return uniqueColors.map((color, index) => ({
-    ...color,
+    r: color.r,
+    g: color.g,
+    b: color.b,
     name: `Color ${index + 1}`
   }));
 }
