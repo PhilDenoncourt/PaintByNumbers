@@ -5,13 +5,15 @@ A React web application that converts any image into a paint-by-numbers template
 ## Features
 
 - **Image Upload**: Drag-and-drop or click to upload any image (JPG, PNG, GIF)
-- **Multiple Color Palettes**: Choose from 5 different color palettes to create different artistic effects:
+- **Multiple Color Palettes**: Choose from 6 different color palettes to create different artistic effects:
   - **Basic** - Simple primary and secondary colors (12 colors)
   - **Pastel** - Soft, muted tones perfect for gentle artwork (12 colors)
   - **Earth Tones** - Natural browns, beiges, and greens for rustic scenes (12 colors)
   - **Vibrant** - Bold, bright colors for energetic designs (12 colors)
   - **Extended** - More color variety for detailed work (24 colors)
+  - **Adaptive** - Automatically extracts 32 dominant colors from your image (32 colors)
 - **Dynamic Palette Switching**: Change palettes on the fly to see different interpretations of your image
+- **Adaptive Color Extraction**: Uses median cut algorithm to identify the most dominant colors in your image
 - **Color Quantization**: Intelligently reduces the image to match the selected palette using Euclidean distance color matching
 - **Edge Detection**: Automatically detects boundaries between different color regions
 - **Region Numbering**: Labels each region with numbers corresponding to the color palette (minimum 10x10 pixels)
@@ -24,15 +26,19 @@ A React web application that converts any image into a paint-by-numbers template
 
 ## How It Works
 
-1. **Color Quantization**: Each pixel in the uploaded image is analyzed and mapped to the closest color in a predefined palette using Euclidean distance in RGB color space.
+1. **Adaptive Palette (Optional)**: When using the Adaptive palette option, the app analyzes your image using a median cut algorithm to extract the 32 most dominant colors. This creates a custom palette specifically tailored to your image.
 
-2. **Edge Detection**: The algorithm checks each pixel against its 8 neighbors to identify boundaries where different colors meet.
+2. **Color Quantization**: Each pixel in the uploaded image is analyzed and mapped to the closest color in the selected palette using Euclidean distance in RGB color space.
 
-3. **Region Detection**: Uses a flood-fill algorithm to identify contiguous regions of the same color.
+3. **Edge Detection**: The algorithm checks each pixel against its 8 neighbors to identify boundaries where different colors meet.
 
-4. **Numbering**: Each region larger than a minimum threshold is labeled with a number at its centroid (center point).
+4. **Region Detection**: Uses a flood-fill algorithm to identify contiguous regions of the same color.
 
-5. **Rendering**: The final template shows white regions with black outlines and numbers, ready for painting.
+5. **Numbering**: Each region larger than a minimum threshold (100 pixels / 10x10) is labeled with a number at its centroid (center point).
+
+6. **Small Region Handling**: Regions smaller than 100 pixels are automatically filled with black.
+
+7. **Rendering**: The final template shows white regions with black outlines and numbers, ready for painting.
 
 ## Installation
 

@@ -28,6 +28,91 @@ export function findClosestPaletteColor(r, g, b, palette) {
 }
 
 /**
+ * Extract dominant colors from image using median cut algorithm
+ */
+export function extractDominantColors(imageData, numColors = 32) {
+  const { width, height, data } = imageData;
+
+  // Sample pixels (use all pixels, but could be optimized by sampling)
+  const pixels = [];
+  const step = Math.max(1, Math.floor((width * height) / 10000)); // Sample up to 10000 pixels
+
+  for (let i = 0; i < data.length; i += step * 4) {
+    pixels.push({
+      r: data[i],
+      g: data[i + 1],
+      b: data[i + 2]
+    });
+  }
+
+  // Median cut algorithm
+  function medianCut(pixels, depth) {
+    if (depth === 0 || pixels.length === 0) {
+      // Calculate average color of this bucket
+      const sum = pixels.reduce(
+        (acc, p) => ({ r: acc.r + p.r, g: acc.g + p.g, b: acc.b + p.b }),
+        { r: 0, g: 0, b: 0 }
+      );
+      return [{
+        r: Math.round(sum.r / pixels.length),
+        g: Math.round(sum.g / pixels.length),
+        b: Math.round(sum.b / pixels.length)
+      }];
+    }
+
+    // Find the channel with the greatest range
+    const ranges = {
+      r: { min: 255, max: 0 },
+      g: { min: 255, max: 0 },
+      b: { min: 255, max: 0 }
+    };
+
+    pixels.forEach(p => {
+      ranges.r.min = Math.min(ranges.r.min, p.r);
+      ranges.r.max = Math.max(ranges.r.max, p.r);
+      ranges.g.min = Math.min(ranges.g.min, p.g);
+      ranges.g.max = Math.max(ranges.g.max, p.g);
+      ranges.b.min = Math.min(ranges.b.min, p.b);
+      ranges.b.max = Math.max(ranges.b.max, p.b);
+    });
+
+    const rRange = ranges.r.max - ranges.r.min;
+    const gRange = ranges.g.max - ranges.g.min;
+    const bRange = ranges.b.max - ranges.b.min;
+
+    // Sort by the channel with greatest range
+    let sortChannel = 'r';
+    let maxRange = rRange;
+    if (gRange > maxRange) {
+      sortChannel = 'g';
+      maxRange = gRange;
+    }
+    if (bRange > maxRange) {
+      sortChannel = 'b';
+    }
+
+    pixels.sort((a, b) => a[sortChannel] - b[sortChannel]);
+
+    // Split at median
+    const mid = Math.floor(pixels.length / 2);
+    const left = pixels.slice(0, mid);
+    const right = pixels.slice(mid);
+
+    return [...medianCut(left, depth - 1), ...medianCut(right, depth - 1)];
+  }
+
+  // Calculate depth needed for numColors buckets (2^depth = numColors)
+  const depth = Math.ceil(Math.log2(numColors));
+  const colors = medianCut(pixels, depth);
+
+  // Return the requested number of colors (may be slightly more due to power of 2)
+  return colors.slice(0, numColors).map((color, index) => ({
+    ...color,
+    name: `Color ${index + 1}`
+  }));
+}
+
+/**
  * Basic/Beginner Palette - Simple primary and secondary colors
  */
 export const BASIC_PALETTE = [
@@ -138,6 +223,7 @@ export const PALETTES = {
   earth: { name: 'Earth Tones (12 colors)', colors: EARTH_TONES_PALETTE },
   vibrant: { name: 'Vibrant (12 colors)', colors: VIBRANT_PALETTE },
   extended: { name: 'Extended (24 colors)', colors: EXTENDED_PALETTE },
+  adaptive: { name: 'Adaptive (32 colors - from image)', colors: null }, // Special case: computed from image
 };
 
 /**

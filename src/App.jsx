@@ -3,7 +3,7 @@ import ImageUploader from './components/ImageUploader';
 import PaintByNumbersCanvas from './components/PaintByNumbersCanvas';
 import ColorPalette from './components/ColorPalette';
 import PaletteSelector from './components/PaletteSelector';
-import { PALETTES, quantizeImage } from './utils/colorUtils';
+import { PALETTES, quantizeImage, extractDominantColors } from './utils/colorUtils';
 import './App.css';
 
 function App() {
@@ -11,9 +11,13 @@ function App() {
   const [imageData, setImageData] = useState(null);
   const [quantized, setQuantized] = useState(null);
   const [selectedPaletteKey, setSelectedPaletteKey] = useState('basic');
+  const [adaptivePalette, setAdaptivePalette] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  const palette = PALETTES[selectedPaletteKey].colors;
+  // Get the current palette - use adaptive if selected and available, otherwise use predefined
+  const palette = selectedPaletteKey === 'adaptive'
+    ? adaptivePalette
+    : PALETTES[selectedPaletteKey].colors;
 
   const handleImageLoad = (img) => {
     setProcessing(true);
@@ -32,7 +36,15 @@ function App() {
 
     // Use setTimeout to prevent blocking the UI
     setTimeout(() => {
-      const quantizedData = quantizeImage(imgData, palette);
+      // If adaptive palette is selected, extract colors from image
+      let paletteToUse = palette;
+      if (selectedPaletteKey === 'adaptive') {
+        const extracted = extractDominantColors(imgData, 32);
+        setAdaptivePalette(extracted);
+        paletteToUse = extracted;
+      }
+
+      const quantizedData = quantizeImage(imgData, paletteToUse);
       setQuantized(quantizedData);
       setProcessing(false);
     }, 100);
@@ -45,7 +57,22 @@ function App() {
     if (imageData) {
       setProcessing(true);
       setTimeout(() => {
-        const newPalette = PALETTES[paletteKey].colors;
+        let newPalette;
+
+        // If switching to adaptive, extract colors from image
+        if (paletteKey === 'adaptive') {
+          // Check if we already have an adaptive palette computed
+          if (adaptivePalette) {
+            newPalette = adaptivePalette;
+          } else {
+            const extracted = extractDominantColors(imageData, 32);
+            setAdaptivePalette(extracted);
+            newPalette = extracted;
+          }
+        } else {
+          newPalette = PALETTES[paletteKey].colors;
+        }
+
         const quantizedData = quantizeImage(imageData, newPalette);
         setQuantized(quantizedData);
         setProcessing(false);
@@ -93,6 +120,7 @@ function App() {
                 setImageData(null);
                 setQuantized(null);
                 setSelectedPaletteKey('basic');
+                setAdaptivePalette(null);
               }}
             >
               Upload New Image
