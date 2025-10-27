@@ -15,6 +15,7 @@ function ColorPalette({ palette }) {
             <div className="color-info">
               <span className="color-number">{index + 1}</span>
               <span className="color-name">{color.name}</span>
+              <span className="color-rgb">RGB({color.r}, {color.g}, {color.b})</span>
             </div>
           </div>
         ))}
