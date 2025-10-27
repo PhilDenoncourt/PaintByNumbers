@@ -8,7 +8,8 @@ export function renderPaintByNumbers(canvas, quantized, palette, options = {}) {
     showNumbers = true,
     showEdges = true,
     minRegionSize = 50,
-    edgeThickness = 2
+    edgeThickness = 2,
+    fillSmallRegions = true
   } = options;
 
   const ctx = canvas.getContext('2d');
@@ -25,16 +26,18 @@ export function renderPaintByNumbers(canvas, quantized, palette, options = {}) {
   // Find all regions
   const regions = findRegions(quantized);
 
-  // Fill small regions with black
-  ctx.fillStyle = 'black';
-  regions.forEach(region => {
-    if (region.pixels.length < minRegionSize) {
-      // Fill each pixel of the small region with black
-      region.pixels.forEach(([y, x]) => {
-        ctx.fillRect(x, y, 1, 1);
-      });
-    }
-  });
+  // Fill small regions with black (if enabled)
+  if (fillSmallRegions) {
+    ctx.fillStyle = 'black';
+    regions.forEach(region => {
+      if (region.pixels.length < minRegionSize) {
+        // Fill each pixel of the small region with black
+        region.pixels.forEach(([y, x]) => {
+          ctx.fillRect(x, y, 1, 1);
+        });
+      }
+    });
+  }
 
   // Draw edges if enabled
   if (showEdges) {

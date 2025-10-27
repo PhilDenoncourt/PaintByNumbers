@@ -7,6 +7,7 @@ function PaintByNumbersCanvas({ quantized, palette, originalImage }) {
   const quantizedRef = useRef(null);
   const originalRef = useRef(null);
   const [zoomedCanvas, setZoomedCanvas] = useState(null);
+  const [fillSmallRegions, setFillSmallRegions] = useState(true);
 
   useEffect(() => {
     if (!quantized || !palette) return;
@@ -16,7 +17,8 @@ function PaintByNumbersCanvas({ quantized, palette, originalImage }) {
       showNumbers: true,
       showEdges: true,
       minRegionSize: 100, // 10x10 pixels minimum
-      edgeThickness: 2
+      edgeThickness: 2,
+      fillSmallRegions: fillSmallRegions
     });
 
     // Render quantized color preview
@@ -29,7 +31,7 @@ function PaintByNumbersCanvas({ quantized, palette, originalImage }) {
       originalRef.current.height = originalImage.height;
       ctx.drawImage(originalImage, 0, 0);
     }
-  }, [quantized, palette, originalImage]);
+  }, [quantized, palette, originalImage, fillSmallRegions]);
 
   if (!quantized) {
     return null;
@@ -45,6 +47,18 @@ function PaintByNumbersCanvas({ quantized, palette, originalImage }) {
 
   return (
     <>
+      <div className="canvas-controls">
+        <label className="toggle-container">
+          <input
+            type="checkbox"
+            checked={fillSmallRegions}
+            onChange={(e) => setFillSmallRegions(e.target.checked)}
+            className="toggle-checkbox"
+          />
+          <span className="toggle-slider"></span>
+          <span className="toggle-label">Fill small regions with black</span>
+        </label>
+      </div>
       <div className="canvas-container">
         <div className="canvas-section">
           <h3>Original Image</h3>
