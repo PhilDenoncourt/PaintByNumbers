@@ -296,6 +296,18 @@ export const EXTENDED_PALETTE = [
 ];
 
 /**
+ * Sherwin-Williams Paint Colors Palette
+ * Format: { r, g, b, name, swNumber }
+ * Add colors below in this format
+ */
+export const SHERWIN_WILLIAMS_PALETTE = [
+  // Example format:
+  // { r: 148, g: 118, b: 108, name: 'Mulberry Silk', swNumber: 1 },
+  // { r: 190, g: 172, b: 159, name: 'Chelsea Mauve', swNumber: 2 },
+  // Add Sherwin-Williams colors here...
+];
+
+/**
  * Collection of all available palettes
  */
 export const PALETTES = {
@@ -304,6 +316,7 @@ export const PALETTES = {
   earth: { name: 'Earth Tones (12 colors)', colors: EARTH_TONES_PALETTE },
   vibrant: { name: 'Vibrant (12 colors)', colors: VIBRANT_PALETTE },
   extended: { name: 'Extended (24 colors)', colors: EXTENDED_PALETTE },
+  sherwinWilliams: { name: 'Sherwin-Williams', colors: SHERWIN_WILLIAMS_PALETTE },
   adaptive: { name: 'Adaptive (up to 32 colors - from image)', colors: null }, // Special case: computed from image
   adaptiveUnique: { name: 'Adaptive Unique (distinct colors only - from image)', colors: null }, // Special case: computed from image with filtering
 };
